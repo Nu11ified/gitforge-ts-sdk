@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { HttpClient } from "../http";
-import { GitForgeError } from "../errors";
+import { GitForgeError, RefUpdateError } from "../errors";
 import { createMockFetch, mockOk, mockError } from "./helpers";
 
 describe("HttpClient", () => {
@@ -177,6 +177,53 @@ describe("HttpClient", () => {
         const e = err as GitForgeError;
         expect(e.status).toBe(409);
         expect(e.code).toBe("branch_moved");
+      }
+    });
+
+    it("throws RefUpdateError on 409 with error=branch_moved and currentSha", async () => {
+      const { fetch } = createMockFetch([{
+        status: 409,
+        body: { error: "branch_moved", currentSha: "abc123def456" },
+        ok: false,
+      }]);
+      const client = makeClient(fetch);
+
+      try {
+        await client.post("/repos/1/commits", { branch: "main" });
+        throw new Error("should have thrown");
+      } catch (err) {
+        expect(err).toBeInstanceOf(RefUpdateError);
+        expect(err).toBeInstanceOf(GitForgeError);
+        const e = err as RefUpdateError;
+        expect(e.status).toBe(409);
+        expect(e.code).toBe("branch_moved");
+        expect(e.currentSha).toBe("abc123def456");
+        expect(e.name).toBe("RefUpdateError");
+      }
+    });
+
+    it("handles non-JSON error body gracefully", async () => {
+      const calls: any[] = [];
+      const mockFetch = async (url: any, init: any) => {
+        calls.push({ url, method: init?.method });
+        return {
+          ok: false,
+          status: 502,
+          json: async () => { throw new SyntaxError("Unexpected token <"); },
+          text: async () => "<html>Bad Gateway</html>",
+        } as Response;
+      };
+      const client = makeClient(mockFetch as any);
+
+      try {
+        await client.get("/repos");
+        throw new Error("should have thrown");
+      } catch (err) {
+        expect(err).toBeInstanceOf(GitForgeError);
+        const e = err as GitForgeError;
+        expect(e.status).toBe(502);
+        expect(e.code).toBe("unknown");
+        expect(e.message).toBe("HTTP 502");
       }
     });
 

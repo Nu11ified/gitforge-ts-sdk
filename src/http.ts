@@ -1,4 +1,4 @@
-import { GitForgeError } from "./errors";
+import { GitForgeError, RefUpdateError } from "./errors";
 
 export interface HttpClientOptions {
   baseUrl: string;
@@ -27,14 +27,23 @@ export class HttpClient {
   private async handleResponse(res: Response): Promise<unknown> {
     if (res.status === 204) return null;
 
-    const body = await res.json();
+    let body: any;
+    try {
+      body = await res.json();
+    } catch {
+      body = null;
+    }
 
     if (!res.ok) {
-      throw new GitForgeError(
-        res.status,
-        body?.code ?? "unknown",
-        body?.message ?? `HTTP ${res.status}`,
-      );
+      const code = body?.code ?? body?.error ?? "unknown";
+      const message = body?.message ?? `HTTP ${res.status}`;
+
+      // CAS conflict: API returns { error: "branch_moved", currentSha }
+      if (res.status === 409 && code === "branch_moved" && body?.currentSha) {
+        throw new RefUpdateError(message, body.currentSha);
+      }
+
+      throw new GitForgeError(res.status, code, message);
     }
 
     return body;

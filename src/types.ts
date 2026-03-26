@@ -10,8 +10,13 @@ export interface Repo {
   lfsEnabled: boolean;
   isArchived: boolean;
   forkedFrom?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  starCount?: number;
+  openPrCount?: number;
+  openIssueCount?: number;
+  topics?: string[];
+  mergeCommitTemplate?: string | null;
 }
 
 /** Branch reference. */
@@ -146,7 +151,7 @@ export interface WebhookDelivery {
   id: string;
   eventType: string;
   payload: string;
-  responseStatus: string | null;
+  responseStatus: number | null;
   responseBody: string | null;
   deliveredAt: string | null;
   createdAt: string;
