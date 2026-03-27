@@ -304,4 +304,141 @@ describe("ReposResource", () => {
       expect(calls[0].headers.Authorization).toBe(`Bearer ${token}`);
     });
   });
+
+  describe("notes", () => {
+    it("createNote sends POST /repos/:id/notes with add action", async () => {
+      const { fetch, calls } = mockOk({ sha: "a".repeat(40), refSha: "b".repeat(40), success: true });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      const result = await repos.createNote("repo-1", "a".repeat(40), "LGTM", { name: "Jane", email: "j@e.com" });
+
+      expect(calls[0].url).toBe("https://api.gitforge.dev/repos/repo-1/notes");
+      expect(calls[0].method).toBe("POST");
+      expect(calls[0].body).toEqual({
+        sha: "a".repeat(40), action: "add", note: "LGTM",
+        author: { name: "Jane", email: "j@e.com" },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it("appendNote sends POST with append action", async () => {
+      const { fetch, calls } = mockOk({ sha: "a".repeat(40), refSha: "b".repeat(40), success: true });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      await repos.appendNote("repo-1", "a".repeat(40), "More notes", { name: "Jane", email: "j@e.com" });
+
+      expect(calls[0].body).toEqual({
+        sha: "a".repeat(40), action: "append", note: "More notes",
+        author: { name: "Jane", email: "j@e.com" },
+      });
+    });
+
+    it("getNote sends GET /repos/:id/notes/:sha", async () => {
+      const { fetch, calls } = mockOk({ sha: "a".repeat(40), note: "Test", refSha: "b".repeat(40) });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      const result = await repos.getNote("repo-1", "a".repeat(40));
+
+      expect(calls[0].url).toBe(`https://api.gitforge.dev/repos/repo-1/notes/${"a".repeat(40)}`);
+      expect(calls[0].method).toBe("GET");
+      expect(result.note).toBe("Test");
+    });
+
+    it("deleteNote sends DELETE /repos/:id/notes/:sha with body", async () => {
+      const { fetch, calls } = mockOk({ sha: "a".repeat(40), refSha: "b".repeat(40), success: true });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      await repos.deleteNote("repo-1", "a".repeat(40), { author: { name: "Jane", email: "j@e.com" } });
+
+      expect(calls[0].url).toBe(`https://api.gitforge.dev/repos/repo-1/notes/${"a".repeat(40)}`);
+      expect(calls[0].method).toBe("DELETE");
+    });
+  });
+
+  describe("restoreCommit", () => {
+    it("sends POST /repos/:id/restore-commit", async () => {
+      const { fetch, calls } = mockOk({ commitSha: "c".repeat(40), treeSha: "d".repeat(40), targetBranch: "main", success: true });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      const result = await repos.restoreCommit("repo-1", {
+        targetBranch: "main",
+        targetCommitSha: "a".repeat(40),
+        author: { name: "Agent", email: "a@e.com" },
+      });
+
+      expect(calls[0].url).toBe("https://api.gitforge.dev/repos/repo-1/restore-commit");
+      expect(calls[0].method).toBe("POST");
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe("listFilesWithMetadata", () => {
+    it("sends GET /repos/:id/files/metadata", async () => {
+      const { fetch, calls } = mockOk({ files: [], commits: {}, ref: "main" });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      await repos.listFilesWithMetadata("repo-1", { ref: "main" });
+
+      expect(calls[0].url).toBe("https://api.gitforge.dev/repos/repo-1/files/metadata?ref=main");
+      expect(calls[0].method).toBe("GET");
+    });
+  });
+
+  describe("pullUpstream", () => {
+    it("sends POST /repos/:id/pull-upstream", async () => {
+      const { fetch, calls } = mockOk({ status: "fast_forward", oldSha: "a".repeat(40), newSha: "b".repeat(40), branch: "main", success: true });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      const result = await repos.pullUpstream("repo-1", { branch: "main" });
+
+      expect(calls[0].url).toBe("https://api.gitforge.dev/repos/repo-1/pull-upstream");
+      expect(calls[0].method).toBe("POST");
+      expect(result.status).toBe("fast_forward");
+    });
+  });
+
+  describe("detachUpstream", () => {
+    it("sends DELETE /repos/:id/base", async () => {
+      const { fetch, calls } = mockOk({ message: "repository detached" });
+      const client = new HttpClient({ baseUrl, token, fetch });
+      const repos = new ReposResource(client);
+
+      const result = await repos.detachUpstream("repo-1");
+
+      expect(calls[0].url).toBe("https://api.gitforge.dev/repos/repo-1/base");
+      expect(calls[0].method).toBe("DELETE");
+      expect(result.message).toBe("repository detached");
+    });
+  });
+
+  describe("getRawFile", () => {
+    it("sends GET /repos/:id/raw/:ref with path query", async () => {
+      // Need a mock that supports arrayBuffer
+      const calls: any[] = [];
+      const mockFetch = async (url: string | URL | Request, init?: RequestInit) => {
+        const urlStr = typeof url === "string" ? url : url instanceof URL ? url.toString() : url.url;
+        calls.push({ url: urlStr, method: init?.method ?? "GET", headers: init?.headers ?? {} });
+        return {
+          ok: true,
+          status: 200,
+          arrayBuffer: async () => new ArrayBuffer(5),
+        } as Response;
+      };
+      const client = new HttpClient({ baseUrl, token, fetch: mockFetch as typeof fetch });
+      const repos = new ReposResource(client);
+
+      const result = await repos.getRawFile("repo-1", "main", "src/index.ts");
+
+      expect(calls[0].url).toBe("https://api.gitforge.dev/repos/repo-1/raw/main?path=src%2Findex.ts");
+      expect(calls[0].method).toBe("GET");
+      expect(result).toBeInstanceOf(ArrayBuffer);
+    });
+  });
 });
