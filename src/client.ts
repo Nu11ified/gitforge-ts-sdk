@@ -9,6 +9,7 @@ import { TokensResource } from "./resources/tokens";
 import { CredentialsResource } from "./resources/credentials";
 import { MirrorsResource } from "./resources/mirrors";
 import { WebhooksResource } from "./resources/webhooks";
+import { SandboxResource } from "./resources/sandbox";
 
 export interface GitForgeOptions {
   baseUrl: string;
@@ -27,6 +28,7 @@ export class GitForge {
   readonly credentials: CredentialsResource;
   readonly mirrors: MirrorsResource;
   readonly webhooks: WebhooksResource;
+  readonly sandbox: SandboxResource;
 
   constructor(opts: GitForgeOptions) {
     const http = new HttpClient(opts);
@@ -40,5 +42,6 @@ export class GitForge {
     this.credentials = new CredentialsResource(http);
     this.mirrors = new MirrorsResource(http);
     this.webhooks = new WebhooksResource(http);
+    this.sandbox = new SandboxResource(http);
   }
 }

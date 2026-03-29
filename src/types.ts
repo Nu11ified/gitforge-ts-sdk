@@ -115,6 +115,15 @@ export interface RepoToken {
   remoteUrl: string;
 }
 
+/** Sandbox URL response for isolated code execution environments. */
+export interface SandboxUrl {
+  remoteUrl: string;
+  token: string;
+  expiresAt: string;
+  branch: string;
+  ephemeralBranch: string | null;
+}
+
 /** Git credential (token field never returned). */
 export interface GitCredential {
   id: string;

@@ -8,7 +8,7 @@ export { GitForgeError, RefUpdateError } from "./errors";
 export type {
   Repo, Branch, Tag, Commit, CommitDetail, DiffEntry,
   TreeEntry, BlobContent, SearchMatch, SearchResult, Comparison,
-  CommitResult, RepoToken, GitCredential, MirrorConfig,
+  CommitResult, RepoToken, SandboxUrl, GitCredential, MirrorConfig,
   Webhook, WebhookDelivery, PaginatedResponse, CommitFileEntry,
 } from "./types";
 
@@ -23,6 +23,7 @@ export type { CreateCommitOptions, ListCommitsOptions } from "./resources/commit
 export { CommitBuilder } from "./resources/commits";
 export type { SearchCodeOptions, SearchCodeResult } from "./resources/search";
 export type { CreateTokenOptions } from "./resources/tokens";
+export type { CreateSandboxUrlOptions } from "./resources/sandbox";
 export type { CreateCredentialOptions, UpdateCredentialOptions } from "./resources/credentials";
 export type { CreateMirrorOptions, UpdateMirrorOptions } from "./resources/mirrors";
 export type { CreateWebhookOptions, WebhookTestResult } from "./resources/webhooks";
