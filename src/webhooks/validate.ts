@@ -30,11 +30,15 @@ export interface ValidateWebhookOptions {
   /** Value of X-GitForge-Timestamp header (unix seconds). */
   timestamp?: string;
   /** Max age in seconds. Default 300. Set to 0 to disable timestamp check. */
-  maxAgeSeconds?: number;
+  tolerance?: number;
 }
 
 /**
  * Full webhook validation: HMAC signature + optional timestamp replay protection.
+ *
+ * When a timestamp is provided, the signature is verified over "timestamp.payload"
+ * (Stripe-style). When no timestamp is present, falls back to signature over
+ * the raw payload only (backward compatibility with old deliveries).
  */
 export function validateWebhook(
   payload: string,
@@ -42,16 +46,21 @@ export function validateWebhook(
   signature: string,
   options?: ValidateWebhookOptions,
 ): boolean {
-  if (!validateWebhookSignature(payload, signature, secret)) return false;
-
-  const maxAge = options?.maxAgeSeconds ?? 300;
   const timestamp = options?.timestamp;
+  const tolerance = options?.tolerance ?? 300;
 
-  if (timestamp && maxAge > 0) {
+  // Determine what the server signed: "timestamp.payload" if timestamp header
+  // was present, otherwise just the raw payload (old-style).
+  const signedPayload = timestamp ? `${timestamp}.${payload}` : payload;
+
+  if (!validateWebhookSignature(signedPayload, signature, secret)) return false;
+
+  // If timestamp is present and tolerance > 0, enforce freshness
+  if (timestamp && tolerance > 0) {
     const ts = parseInt(timestamp, 10);
     if (isNaN(ts)) return false;
     const now = Math.floor(Date.now() / 1000);
-    if (Math.abs(now - ts) > maxAge) return false;
+    if (Math.abs(now - ts) > tolerance) return false;
   }
 
   return true;
