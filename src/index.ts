@@ -19,7 +19,7 @@ export { paginate, type PageFetcher, type PaginateOptions } from "./pagination";
 export type { CreateRepoOptions, UpdateRepoOptions, ListReposOptions } from "./resources/repos";
 export type { CreateBranchOptions, ListBranchesOptions, PromoteBranchOptions, PromoteResult } from "./resources/branches";
 export type { CreateTagOptions, ListTagsOptions } from "./resources/tags";
-export type { CreateCommitOptions, ListCommitsOptions } from "./resources/commits";
+export type { CreateCommitOptions, CreateCommitFromDiffOptions, ListCommitsOptions } from "./resources/commits";
 export { CommitBuilder } from "./resources/commits";
 export type { SearchCodeOptions, SearchCodeResult } from "./resources/search";
 export type { CreateTokenOptions } from "./resources/tokens";

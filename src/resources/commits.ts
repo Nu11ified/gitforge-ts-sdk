@@ -63,6 +63,16 @@ export class CommitBuilder {
   }
 }
 
+export interface CreateCommitFromDiffOptions {
+  targetBranch: string;
+  commitMessage: string;
+  authorName: string;
+  authorEmail: string;
+  diff: string;
+  baseBranch?: string;
+  expectedHeadSha?: string;
+}
+
 export class CommitsResource {
   constructor(private http: HttpClient) {}
 
@@ -84,5 +94,17 @@ export class CommitsResource {
 
   create(repoId: string, opts: CreateCommitOptions): CommitBuilder {
     return new CommitBuilder(this.http, repoId, opts);
+  }
+
+  async createFromDiff(repoId: string, opts: CreateCommitFromDiffOptions): Promise<CommitResult> {
+    const body: Record<string, unknown> = {
+      targetBranch: opts.targetBranch,
+      commitMessage: opts.commitMessage,
+      author: { name: opts.authorName, email: opts.authorEmail },
+      diff: opts.diff,
+    };
+    if (opts.baseBranch) body.baseBranch = opts.baseBranch;
+    if (opts.expectedHeadSha) body.expectedHeadSha = opts.expectedHeadSha;
+    return this.http.post<CommitResult>(`/repos/${repoId}/diff-commit`, body);
   }
 }

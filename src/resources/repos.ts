@@ -106,4 +106,13 @@ export class ReposResource {
     if (opts?.download) query.download = "true";
     return this.http.getRaw(`/repos/${repoId}/raw/${ref}`, query);
   }
+
+  // --- Archive ---
+
+  async getArchive(repoId: string, ref: string, opts?: { format?: "tarball" | "zip"; paths?: string[] }): Promise<ArrayBuffer> {
+    const format = opts?.format ?? "tarball";
+    const query: Record<string, string> = {};
+    if (opts?.paths?.length) query.paths = opts.paths.join(",");
+    return this.http.getRaw(`/repos/${repoId}/archive/${format}/${ref}`, query);
+  }
 }
