@@ -36,9 +36,9 @@ export interface ValidateWebhookOptions {
 /**
  * Full webhook validation: HMAC signature + optional timestamp replay protection.
  *
- * Signature is always verified over the raw payload. When a timestamp is
- * provided and maxAgeSeconds > 0, an additional freshness check rejects
- * replayed deliveries.
+ * When a timestamp is provided, the signature is verified over "timestamp.payload"
+ * (Stripe-style). When no timestamp is present, falls back to signature over
+ * the raw payload only (backward compatibility with old deliveries).
  */
 export function validateWebhook(
   payload: string,
@@ -46,10 +46,12 @@ export function validateWebhook(
   signature: string,
   options?: ValidateWebhookOptions,
 ): boolean {
-  if (!validateWebhookSignature(payload, signature, secret)) return false;
-
   const timestamp = options?.timestamp;
   const maxAge = options?.maxAgeSeconds ?? 300;
+
+  // Verify signature over "timestamp.payload" when timestamp is present
+  const signedPayload = timestamp ? `${timestamp}.${payload}` : payload;
+  if (!validateWebhookSignature(signedPayload, signature, secret)) return false;
 
   // If timestamp is present and maxAge > 0, enforce freshness
   if (timestamp && maxAge > 0) {

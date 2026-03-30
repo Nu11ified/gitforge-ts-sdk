@@ -39,16 +39,16 @@ describe("validateWebhook", () => {
   it("returns true when signature and timestamp are valid", () => {
     const payload = '{"event":"push"}';
     const secret = "my-secret";
-    const sig = sign(payload, secret);
     const timestamp = Math.floor(Date.now() / 1000).toString();
+    const sig = sign(`${timestamp}.${payload}`, secret);
     expect(validateWebhook(payload, secret, sig, { timestamp })).toBe(true);
   });
 
   it("returns false for expired timestamp", () => {
     const payload = '{"event":"push"}';
     const secret = "my-secret";
-    const sig = sign(payload, secret);
     const oldTimestamp = String(Math.floor(Date.now() / 1000) - 600);
+    const sig = sign(`${oldTimestamp}.${payload}`, secret);
     expect(validateWebhook(payload, secret, sig, {
       timestamp: oldTimestamp,
       maxAgeSeconds: 300,
@@ -58,8 +58,8 @@ describe("validateWebhook", () => {
   it("skips timestamp check when maxAgeSeconds is 0", () => {
     const payload = '{"event":"push"}';
     const secret = "my-secret";
-    const sig = sign(payload, secret);
     const oldTimestamp = String(Math.floor(Date.now() / 1000) - 99999);
+    const sig = sign(`${oldTimestamp}.${payload}`, secret);
     expect(validateWebhook(payload, secret, sig, {
       timestamp: oldTimestamp,
       maxAgeSeconds: 0,
@@ -76,8 +76,8 @@ describe("validateWebhook", () => {
   it("uses default maxAgeSeconds of 300", () => {
     const payload = '{"event":"push"}';
     const secret = "my-secret";
-    const sig = sign(payload, secret);
     const recentTimestamp = String(Math.floor(Date.now() / 1000) - 200);
+    const sig = sign(`${recentTimestamp}.${payload}`, secret);
     expect(validateWebhook(payload, secret, sig, {
       timestamp: recentTimestamp,
     })).toBe(true);
@@ -85,8 +85,8 @@ describe("validateWebhook", () => {
 
   it("returns false when signature is invalid regardless of timestamp", () => {
     const payload = '{"event":"push"}';
-    const sig = sign(payload, "wrong");
     const timestamp = Math.floor(Date.now() / 1000).toString();
+    const sig = sign(`${timestamp}.${payload}`, "wrong");
     expect(validateWebhook(payload, "correct", sig, { timestamp })).toBe(false);
   });
 });
