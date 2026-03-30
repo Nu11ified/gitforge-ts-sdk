@@ -107,15 +107,15 @@ try {
 
 ## Contributing
 
-This SDK is developed inside the [GitForge monorepo](https://github.com/Nu11ified/GitForge) at `sdks/typescript/` and published to this repo via git subtree.
+Contributions are welcome! Please open a pull request against this repository.
 
-To contribute:
-
-1. Clone the monorepo: `git clone https://github.com/Nu11ified/GitForge.git`
+1. Fork this repo
 2. Install dependencies: `bun install`
-3. Make changes in `sdks/typescript/`
-4. Run tests: `bun test sdks/typescript/`
-5. Submit a PR to the monorepo
+3. Make your changes
+4. Run tests: `bun test`
+5. Submit a PR
+
+Accepted changes are pulled into the main GitForge monorepo by the maintainers.
 
 ## License
 
