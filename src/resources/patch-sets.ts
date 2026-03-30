@@ -71,6 +71,59 @@ export interface MaterializeResult {
   status: string;
 }
 
+export interface PublishResult {
+  id: string;
+  name: string;
+  visibility: "public";
+  ownerName: string;
+  repoName: string;
+  patchCount: number;
+}
+
+export interface ForkResult {
+  id: string;
+  name: string;
+  forkedFromId: string;
+  repoId: string;
+  patchCount: number;
+}
+
+export interface UpdateChange {
+  type: "added" | "modified" | "removed" | "reordered";
+  patchId: string;
+  name: string;
+  order: number;
+}
+
+export interface UpdatesResult {
+  hasUpdates: boolean;
+  upstreamSetId: string;
+  changes: UpdateChange[];
+}
+
+export interface AcceptUpdatesOptions {
+  patches: string[] | ["all"];
+}
+
+export interface AcceptResult {
+  accepted: number;
+  conflicts: number;
+}
+
+export interface ExploreOptions {
+  q?: string;
+  base?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ExploreResult {
+  items: PatchSet[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export class PatchSetsResource {
   constructor(private http: HttpClient) {}
 
@@ -124,5 +177,47 @@ export class PatchSetsResource {
 
   async materialize(setId: string): Promise<MaterializeResult> {
     return this.http.post(`/patch-sets/${setId}/materialize`);
+  }
+
+  // ---- Sharing methods ----
+
+  async publish(setId: string): Promise<PublishResult> {
+    return this.http.post(`/patch-sets/${setId}/publish`);
+  }
+
+  async unpublish(setId: string): Promise<void> {
+    return this.http.delete(`/patch-sets/${setId}/publish`) as any;
+  }
+
+  async fork(setId: string, opts?: { name?: string }): Promise<ForkResult> {
+    return this.http.post(`/patch-sets/${setId}/fork`, opts ?? {});
+  }
+
+  async subscribe(setId: string): Promise<void> {
+    return this.http.post(`/patch-sets/${setId}/subscribe`) as any;
+  }
+
+  async unsubscribe(setId: string): Promise<void> {
+    return this.http.delete(`/patch-sets/${setId}/subscribe`) as any;
+  }
+
+  async getUpdates(setId: string): Promise<UpdatesResult> {
+    return this.http.get<UpdatesResult>(`/patch-sets/${setId}/updates`);
+  }
+
+  async acceptUpdates(
+    setId: string,
+    opts: AcceptUpdatesOptions,
+  ): Promise<AcceptResult> {
+    return this.http.post(`/patch-sets/${setId}/updates/accept`, opts);
+  }
+
+  async explore(opts?: ExploreOptions): Promise<ExploreResult> {
+    const query: Record<string, string> = {};
+    if (opts?.q) query.q = opts.q;
+    if (opts?.base) query.base = opts.base;
+    if (opts?.page) query.page = String(opts.page);
+    if (opts?.pageSize) query.pageSize = String(opts.pageSize);
+    return this.http.get<ExploreResult>("/explore/patch-sets", query);
   }
 }

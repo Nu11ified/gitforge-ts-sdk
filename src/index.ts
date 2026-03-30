@@ -31,6 +31,8 @@ export type {
   PatchSet, Patch, PatchSetWithPatches,
   CreatePatchSetOptions, UpdatePatchSetOptions, AddPatchOptions, UpdatePatchOptions,
   RebaseResult, MaterializeResult,
+  PublishResult, ForkResult, UpdateChange, UpdatesResult,
+  AcceptUpdatesOptions, AcceptResult, ExploreOptions, ExploreResult,
 } from "./resources/patch-sets";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
