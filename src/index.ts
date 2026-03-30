@@ -27,6 +27,11 @@ export type { CreateSandboxUrlOptions } from "./resources/sandbox";
 export type { CreateCredentialOptions, UpdateCredentialOptions } from "./resources/credentials";
 export type { CreateMirrorOptions, UpdateMirrorOptions } from "./resources/mirrors";
 export type { CreateWebhookOptions, WebhookTestResult } from "./resources/webhooks";
+export type {
+  PatchSet, Patch, PatchSetWithPatches,
+  CreatePatchSetOptions, UpdatePatchSetOptions, AddPatchOptions, UpdatePatchOptions,
+  RebaseResult, MaterializeResult,
+} from "./resources/patch-sets";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
 export { validateWebhook, validateWebhookSignature, type ValidateWebhookOptions } from "./webhooks/validate";

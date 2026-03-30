@@ -10,6 +10,7 @@ import { CredentialsResource } from "./resources/credentials";
 import { MirrorsResource } from "./resources/mirrors";
 import { WebhooksResource } from "./resources/webhooks";
 import { SandboxResource } from "./resources/sandbox";
+import { PatchSetsResource } from "./resources/patch-sets";
 
 export interface GitForgeOptions {
   baseUrl: string;
@@ -29,6 +30,7 @@ export class GitForge {
   readonly mirrors: MirrorsResource;
   readonly webhooks: WebhooksResource;
   readonly sandbox: SandboxResource;
+  readonly patchSets: PatchSetsResource;
 
   constructor(opts: GitForgeOptions) {
     const http = new HttpClient(opts);
@@ -43,5 +45,6 @@ export class GitForge {
     this.mirrors = new MirrorsResource(http);
     this.webhooks = new WebhooksResource(http);
     this.sandbox = new SandboxResource(http);
+    this.patchSets = new PatchSetsResource(http);
   }
 }
