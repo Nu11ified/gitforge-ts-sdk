@@ -47,6 +47,21 @@ export interface UpdatePatchSetOptions {
   visibility?: string;
 }
 
+export interface ExtractFromCommitsOptions {
+  branch: string;
+  since?: string;
+}
+
+export interface ExtractedPatch {
+  id: string;
+  name: string;
+  order: number;
+}
+
+export interface ExtractFromCommitsResult {
+  extracted: ExtractedPatch[];
+}
+
 export interface AddPatchOptions {
   name: string;
   diff: string;
@@ -169,6 +184,13 @@ export class PatchSetsResource {
 
   async removePatch(setId: string, patchId: string): Promise<null> {
     return this.http.delete(`/patch-sets/${setId}/patches/${patchId}`);
+  }
+
+  async extractFromCommits(
+    setId: string,
+    opts: ExtractFromCommitsOptions,
+  ): Promise<ExtractFromCommitsResult> {
+    return this.http.post(`/patch-sets/${setId}/extract-from-commits`, opts);
   }
 
   async rebase(setId: string): Promise<RebaseResult> {
