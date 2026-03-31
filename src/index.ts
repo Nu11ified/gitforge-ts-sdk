@@ -34,6 +34,11 @@ export type {
   PublishResult, ForkResult, UpdateChange, UpdatesResult,
   AcceptUpdatesOptions, AcceptResult, ExploreOptions, ExploreResult,
 } from "./resources/patch-sets";
+export type {
+  Change, CreateChangeOptions, AmendOptions, SquashOptions, SplitOptions,
+  SplitResult, SquashResult, MaterializeResult as ChangeMaterializeResult, ImportOptions,
+} from "./resources/changes";
+export type { Operation } from "./resources/operations";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
 export { validateWebhook, validateWebhookSignature, type ValidateWebhookOptions } from "./webhooks/validate";
