@@ -49,7 +49,9 @@ export class HotResource {
     const query: Record<string, string> = {};
     query.ref = opts.ref ?? "main";
     if (opts.depth !== undefined) query.depth = String(opts.depth);
-    const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+    // "." means root tree — use "root" to avoid URL normalization stripping the dot
+    const safePath = path === "." || path === "" ? "root" : path;
+    const encodedPath = safePath.split("/").map(encodeURIComponent).join("/");
     return this.http.get<HotTreeResult>(`/repos/${repoId}/hot/tree/${encodedPath}`, query);
   }
 
