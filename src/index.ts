@@ -43,6 +43,8 @@ export type {
   SplitResult, SquashResult, MaterializeResult as ChangeMaterializeResult, ImportOptions,
 } from "./resources/changes";
 export type { Operation } from "./resources/operations";
+export type { HotReadFileOptions, HotListTreeOptions, HotCommitOptions, HotListRefsOptions, HotCreateRefOptions } from "./resources/hot";
+export type { StateCurrentItem } from "./resources/state";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
 export { validateWebhook, validateWebhookSignature, type ValidateWebhookOptions } from "./webhooks/validate";

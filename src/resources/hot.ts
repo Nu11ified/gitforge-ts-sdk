@@ -41,14 +41,16 @@ export class HotResource {
     const query: Record<string, string> = {};
     query.ref = opts.ref ?? "main";
     if (opts.include?.length) query.include = opts.include.join(",");
-    return this.http.get<HotFile>(`/repos/${repoId}/hot/files/${path}`, query);
+    const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+    return this.http.get<HotFile>(`/repos/${repoId}/hot/files/${encodedPath}`, query);
   }
 
   async listTree(repoId: string, path: string, opts: HotListTreeOptions = {}): Promise<HotTreeResult> {
     const query: Record<string, string> = {};
     query.ref = opts.ref ?? "main";
     if (opts.depth !== undefined) query.depth = String(opts.depth);
-    return this.http.get<HotTreeResult>(`/repos/${repoId}/hot/tree/${path}`, query);
+    const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+    return this.http.get<HotTreeResult>(`/repos/${repoId}/hot/tree/${encodedPath}`, query);
   }
 
   async commit(repoId: string, opts: HotCommitOptions): Promise<HotCommitResult> {
