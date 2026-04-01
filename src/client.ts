@@ -15,6 +15,10 @@ import { ChangesResource } from "./resources/changes";
 import { OperationsResource } from "./resources/operations";
 import { HotResource } from "./resources/hot";
 import { StateResource } from "./resources/state";
+import { BatchResource } from "./resources/batch";
+import { RecipesResource } from "./resources/recipes";
+import { JobsResource } from "./resources/jobs";
+import { StreamsResource } from "./resources/streams";
 
 export interface GitForgeOptions {
   baseUrl: string;
@@ -39,6 +43,10 @@ export class GitForge {
   readonly operations: OperationsResource;
   readonly hot: HotResource;
   readonly state: StateResource;
+  readonly batch: BatchResource;
+  readonly recipes: RecipesResource;
+  readonly jobs: JobsResource;
+  readonly streams: StreamsResource;
 
   constructor(opts: GitForgeOptions) {
     const http = new HttpClient(opts);
@@ -58,5 +66,9 @@ export class GitForge {
     this.operations = new OperationsResource(http);
     this.hot = new HotResource(http);
     this.state = new StateResource(http);
+    this.batch = new BatchResource(http);
+    this.recipes = new RecipesResource(http);
+    this.jobs = new JobsResource(http);
+    this.streams = new StreamsResource(http);
   }
 }

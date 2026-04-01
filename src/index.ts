@@ -45,6 +45,10 @@ export type {
 export type { Operation } from "./resources/operations";
 export type { HotReadFileOptions, HotListTreeOptions, HotCommitOptions, HotListRefsOptions, HotCreateRefOptions } from "./resources/hot";
 export type { StateCurrentItem } from "./resources/state";
+export type { BatchBranchItem, BatchCommitItem, BatchFileReadItem, BatchFileWriteItem, BatchRefItem, BatchPrItem, BatchDiffItem, BatchOptions } from "./resources/batch";
+export type { RunRecipeOptions, PatchFleetOptions, SnapshotOptions } from "./resources/recipes";
+export type { ListJobsOptions, WaitForOptions } from "./resources/jobs";
+export type { RepoStreamOptions, ChangeStreamOptions } from "./resources/streams";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
 export { validateWebhook, validateWebhookSignature, type ValidateWebhookOptions } from "./webhooks/validate";
