@@ -10,6 +10,10 @@ export type {
   TreeEntry, BlobContent, SearchMatch, SearchResult, Comparison,
   CommitResult, RepoToken, SandboxUrl, GitCredential, MirrorConfig,
   Webhook, WebhookDelivery, PaginatedResponse, CommitFileEntry,
+  HotFile, HotTreeEntry, HotTreeResult, HotCommitResult, HotRefEntry,
+  BatchItem, BatchResponse, BatchSummary, Job,
+  RecipeResult, RecipeJobResult, StreamEvent, RepoState,
+  DiffFile, DiffResult,
 } from "./types";
 
 // Pagination

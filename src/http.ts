@@ -150,7 +150,8 @@ export class HttpClient {
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
 
-        for (const line of lines) {
+        for (const raw of lines) {
+          const line = raw.endsWith("\r") ? raw.slice(0, -1) : raw;
           if (line === "") {
             // Empty line = end of event
             if (currentData) {
@@ -163,7 +164,8 @@ export class HttpClient {
           } else if (line.startsWith("event:")) {
             currentEvent = line.slice(6).trim();
           } else if (line.startsWith("data:")) {
-            currentData = line.slice(5).trim();
+            const value = line.slice(5).trim();
+            currentData = currentData === "" ? value : currentData + "\n" + value;
           }
         }
       }
@@ -172,6 +174,7 @@ export class HttpClient {
         yield { event: currentEvent, data: currentData };
       }
     } finally {
+      try { await reader.cancel(); } catch { /* ignore */ }
       reader.releaseLock();
     }
   }
