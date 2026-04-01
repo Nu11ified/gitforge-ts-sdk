@@ -30,7 +30,7 @@ export class JobsResource {
   }
 
   async cancel(jobId: string): Promise<{ status: string }> {
-    return this.http.delete(`/jobs/${jobId}`) as unknown as Promise<{ status: string }>;
+    return this.http.deleteWithBody<{ status: string }>(`/jobs/${jobId}`);
   }
 
   async waitFor(jobId: string, opts: WaitForOptions = {}): Promise<Job> {
