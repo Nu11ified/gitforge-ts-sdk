@@ -13,6 +13,8 @@ import { SandboxResource } from "./resources/sandbox";
 import { PatchSetsResource } from "./resources/patch-sets";
 import { ChangesResource } from "./resources/changes";
 import { OperationsResource } from "./resources/operations";
+import { HotResource } from "./resources/hot";
+import { StateResource } from "./resources/state";
 
 export interface GitForgeOptions {
   baseUrl: string;
@@ -35,6 +37,8 @@ export class GitForge {
   readonly patchSets: PatchSetsResource;
   readonly changes: ChangesResource;
   readonly operations: OperationsResource;
+  readonly hot: HotResource;
+  readonly state: StateResource;
 
   constructor(opts: GitForgeOptions) {
     const http = new HttpClient(opts);
@@ -52,5 +56,7 @@ export class GitForge {
     this.patchSets = new PatchSetsResource(http);
     this.changes = new ChangesResource(http);
     this.operations = new OperationsResource(http);
+    this.hot = new HotResource(http);
+    this.state = new StateResource(http);
   }
 }
