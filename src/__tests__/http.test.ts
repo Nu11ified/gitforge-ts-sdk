@@ -302,3 +302,77 @@ describe("HttpClient", () => {
     });
   });
 });
+
+describe("HttpClient.sse", () => {
+  it("returns an AsyncIterable that yields parsed SSE events", async () => {
+    const sseBody = [
+      "event: push\n",
+      "data: {\"repoId\":\"r1\",\"type\":\"push\"}\n",
+      "\n",
+      "event: pr_merged\n",
+      "data: {\"repoId\":\"r2\",\"type\":\"pr_merged\"}\n",
+      "\n",
+    ].join("");
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(sseBody));
+        controller.close();
+      },
+    });
+
+    const mockFetch = async () =>
+      new Response(stream, {
+        status: 200,
+        headers: { "Content-Type": "text/event-stream" },
+      });
+
+    const client = new HttpClient({
+      baseUrl: "https://api.gitforge.dev",
+      token: "gf_test",
+      fetch: mockFetch as typeof globalThis.fetch,
+    });
+
+    const events: Array<{ event: string; data: string }> = [];
+    for await (const evt of client.sse("/stream/changes")) {
+      events.push(evt);
+    }
+
+    expect(events).toHaveLength(2);
+    expect(events[0].event).toBe("push");
+    expect(JSON.parse(events[0].data).repoId).toBe("r1");
+    expect(events[1].event).toBe("pr_merged");
+  });
+
+  it("skips comment lines", async () => {
+    const sseBody = ": heartbeat\nevent: push\ndata: {}\n\n";
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(sseBody));
+        controller.close();
+      },
+    });
+
+    const mockFetch = async () =>
+      new Response(stream, {
+        status: 200,
+        headers: { "Content-Type": "text/event-stream" },
+      });
+
+    const client = new HttpClient({
+      baseUrl: "https://api.gitforge.dev",
+      token: "gf_test",
+      fetch: mockFetch as typeof globalThis.fetch,
+    });
+
+    const events: Array<{ event: string; data: string }> = [];
+    for await (const evt of client.sse("/test")) {
+      events.push(evt);
+    }
+
+    expect(events).toHaveLength(1);
+    expect(events[0].event).toBe("push");
+  });
+});

@@ -112,4 +112,67 @@ export class HttpClient {
     });
     return this.handleResponse(res) as Promise<T>;
   }
+
+  async *sse(
+    path: string,
+    query?: Record<string, string>,
+  ): AsyncGenerator<{ event: string; data: string }> {
+    let url = `${this.baseUrl}${path}`;
+    if (query && Object.keys(query).length > 0) {
+      url += "?" + new URLSearchParams(query).toString();
+    }
+    const res = await this.fetch(url, {
+      method: "GET",
+      headers: this.headers({ Accept: "text/event-stream" }),
+    });
+    if (!res.ok) {
+      let body: unknown;
+      try { body = await res.json(); } catch { body = null; }
+      const errBody = body as Record<string, string> | null;
+      const code = errBody?.code ?? errBody?.error ?? "unknown";
+      const message = errBody?.message ?? `HTTP ${res.status}`;
+      throw new GitForgeError(res.status, code, message);
+    }
+    if (!res.body) return;
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let currentEvent = "message";
+    let currentData = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (line === "") {
+            // Empty line = end of event
+            if (currentData) {
+              yield { event: currentEvent, data: currentData };
+            }
+            currentEvent = "message";
+            currentData = "";
+          } else if (line.startsWith(":")) {
+            // Comment — skip
+          } else if (line.startsWith("event:")) {
+            currentEvent = line.slice(6).trim();
+          } else if (line.startsWith("data:")) {
+            currentData = line.slice(5).trim();
+          }
+        }
+      }
+      // Flush any remaining event
+      if (currentData) {
+        yield { event: currentEvent, data: currentData };
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
 }

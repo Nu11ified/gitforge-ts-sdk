@@ -182,3 +182,125 @@ export interface CommitFileEntry {
   encoding?: "utf8" | "base64";
   mode?: "100644" | "100755" | "120000";
 }
+
+/** Hot-path file read result. */
+export interface HotFile {
+  path: string;
+  content?: string;
+  size?: number;
+  mode?: string;
+  sha?: string;
+  encoding?: string;
+  lastCommit?: { sha: string; message: string; author: string; date: string };
+}
+
+/** Hot-path tree entry. */
+export interface HotTreeEntry {
+  name: string;
+  path: string;
+  type: "blob" | "tree";
+  mode: string;
+  sha: string;
+  size?: number;
+}
+
+/** Hot-path tree response. */
+export interface HotTreeResult {
+  entries: HotTreeEntry[];
+  truncated?: boolean;
+}
+
+/** Hot-path commit result. */
+export interface HotCommitResult {
+  commitSha: string;
+  treeSha: string;
+  parentShas: string[];
+  ref: string;
+}
+
+/** Hot-path ref entry. */
+export interface HotRefEntry {
+  name: string;
+  sha: string;
+  type: "branch" | "tag";
+}
+
+/** Batch operation result (per item). */
+export interface BatchItem<T = unknown> {
+  index: number;
+  status: "fulfilled" | "rejected";
+  value?: T;
+  error?: { code: string; message: string };
+}
+
+/** Batch operation response. */
+export interface BatchResponse<T = unknown> {
+  results: BatchItem<T>[];
+  summary: BatchSummary;
+}
+
+/** Batch summary statistics. */
+export interface BatchSummary {
+  total: number;
+  succeeded: number;
+  failed: number;
+}
+
+/** Job status object. */
+export interface Job {
+  id: string;
+  type: string;
+  status: "queued" | "running" | "completed" | "failed" | "cancelled";
+  progress: { completed: number; failed: number; total: number } | null;
+  result: unknown;
+  error: { code: string; message: string } | null;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
+/** Recipe execution result (sync). */
+export interface RecipeResult {
+  status: "completed" | "failed";
+  steps: Array<{ name: string; summary: BatchSummary }>;
+  results: unknown[];
+}
+
+/** Recipe execution result (async). */
+export interface RecipeJobResult {
+  jobId: string;
+  status: "running";
+}
+
+/** SSE event from a change stream. */
+export interface StreamEvent {
+  event: string;
+  data: Record<string, unknown>;
+}
+
+/** Per-repo state result from /state/current. */
+export interface RepoState {
+  repoId: string;
+  ref: string;
+  headSha: string | null;
+  files: Array<HotFile | { path: string; status: "not_found" }>;
+}
+
+/** Diff file entry from batch diff. */
+export interface DiffFile {
+  path: string;
+  status: string;
+  oldPath?: string;
+  mode?: string;
+  oldMode?: string;
+  blobSha?: string;
+  oldBlobSha?: string;
+}
+
+/** Batch diff result per item. */
+export interface DiffResult {
+  repoId: string;
+  base: string;
+  head: string;
+  files: DiffFile[];
+}
