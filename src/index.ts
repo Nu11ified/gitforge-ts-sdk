@@ -49,6 +49,19 @@ export type { BatchBranchItem, BatchCommitItem, BatchFileReadItem, BatchFileWrit
 export type { RunRecipeOptions, PatchFleetOptions, SnapshotOptions } from "./resources/recipes";
 export type { ListJobsOptions, WaitForOptions } from "./resources/jobs";
 export type { RepoStreamOptions, ChangeStreamOptions } from "./resources/streams";
+export type {
+  ListTraverseReposOptions, GetTraverseRepoOptions, ImpactOptions,
+  TraverseRepoSummary, IndexStatus, FileTreeEntry, FileSymbols, SymbolInfo, ImportInfo,
+  FileSummary, ArchitectureInfo, TraverseRepoResult, ImpactedFile, ImpactResult,
+} from "./resources/traverse";
+export type {
+  LineAnchor, PatternAnchor, TextAnchor, Indentation, IndentationSpec,
+  TextPatchEdit, MetadataOperation, MetadataEdit, BinaryPatch, BinaryPatchEdit, Edit,
+  ApplyEditsOptions, EditResultItem, ValidationDiagnostic, ValidationResult,
+  ApplyEditsResult, ContextOptions, ContextFileEntry, ContextResult,
+  CreateSessionOptions, CreateSessionResult, EditSession,
+  SubmitSessionOptions, SubmitSessionResult,
+} from "./resources/edit";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
 export { validateWebhook, validateWebhookSignature, type ValidateWebhookOptions } from "./webhooks/validate";

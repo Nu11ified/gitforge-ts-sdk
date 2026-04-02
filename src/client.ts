@@ -19,6 +19,8 @@ import { BatchResource } from "./resources/batch";
 import { RecipesResource } from "./resources/recipes";
 import { JobsResource } from "./resources/jobs";
 import { StreamsResource } from "./resources/streams";
+import { TraverseResource } from "./resources/traverse";
+import { EditResource } from "./resources/edit";
 
 export interface GitForgeOptions {
   baseUrl: string;
@@ -47,6 +49,8 @@ export class GitForge {
   readonly recipes: RecipesResource;
   readonly jobs: JobsResource;
   readonly streams: StreamsResource;
+  readonly traverse: TraverseResource;
+  readonly edit: EditResource;
 
   constructor(opts: GitForgeOptions) {
     const http = new HttpClient(opts);
@@ -70,5 +74,7 @@ export class GitForge {
     this.recipes = new RecipesResource(http);
     this.jobs = new JobsResource(http);
     this.streams = new StreamsResource(http);
+    this.traverse = new TraverseResource(http);
+    this.edit = new EditResource(http);
   }
 }
