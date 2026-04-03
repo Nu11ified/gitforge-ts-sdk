@@ -304,3 +304,38 @@ export interface DiffResult {
   head: string;
   files: DiffFile[];
 }
+
+/** Result from a single-repo shell command execution. */
+export interface ShellExecResult {
+  sessionId: string;
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+  ref: string | null;
+  headSha: string | null;
+  pendingChanges: number;
+}
+
+/** Mount entry in a multi-repo shell session. */
+export interface ShellMount {
+  path: string;
+  repoId: string;
+  ref: string;
+  headSha: string;
+  pendingChanges: number;
+}
+
+/** Result from a multi-repo shell command execution. */
+export interface ShellMultiExecResult {
+  sessionId: string;
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+  mounts: ShellMount[];
+}
+
+/** Result from destroying a shell session. */
+export interface ShellDestroyResult {
+  destroyed: boolean;
+  uncommittedFiles: number;
+}

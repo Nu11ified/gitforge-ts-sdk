@@ -14,6 +14,7 @@ export type {
   BatchItem, BatchResponse, BatchSummary, Job,
   RecipeResult, RecipeJobResult, StreamEvent, RepoState,
   DiffFile, DiffResult,
+  ShellExecResult, ShellMount, ShellMultiExecResult, ShellDestroyResult,
 } from "./types";
 
 // Pagination
@@ -62,6 +63,8 @@ export type {
   CreateSessionOptions, CreateSessionResult, EditSession,
   SubmitSessionOptions, SubmitSessionResult,
 } from "./resources/edit";
+
+export type { ShellExecOptions, ShellMultiExecOptions } from "./resources/shell";
 
 // Webhook validation (also available via "@gitforge/sdk/webhooks" subpath)
 export { validateWebhook, validateWebhookSignature, type ValidateWebhookOptions } from "./webhooks/validate";

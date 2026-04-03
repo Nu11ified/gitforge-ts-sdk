@@ -21,6 +21,7 @@ import { JobsResource } from "./resources/jobs";
 import { StreamsResource } from "./resources/streams";
 import { TraverseResource } from "./resources/traverse";
 import { EditResource } from "./resources/edit";
+import { ShellResource } from "./resources/shell";
 
 export interface GitForgeOptions {
   baseUrl: string;
@@ -51,6 +52,7 @@ export class GitForge {
   readonly streams: StreamsResource;
   readonly traverse: TraverseResource;
   readonly edit: EditResource;
+  readonly shell: ShellResource;
 
   constructor(opts: GitForgeOptions) {
     const http = new HttpClient(opts);
@@ -76,5 +78,6 @@ export class GitForge {
     this.streams = new StreamsResource(http);
     this.traverse = new TraverseResource(http);
     this.edit = new EditResource(http);
+    this.shell = new ShellResource(http);
   }
 }
